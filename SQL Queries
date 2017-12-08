@@ -1,0 +1,52 @@
+SP 
+select * from sys.objects
+where type='P'
+and name = 'usp_Receivables_Invoice_Closed_AUTO'
+
+SELECT ROUTINE_NAME, ROUTINE_DEFINITION
+FROM INFORMATION_SCHEMA.ROUTINES 
+WHERE ROUTINE_DEFINITION LIKE '%usp_Receivables_Invoice_Closed_AUTO%' 
+AND ROUTINE_TYPE='PROCEDURE'
+
+--For searching the words in SP
+SELECT OBJECT_NAME(id) 
+FROM SYSCOMMENTS 
+WHERE [text] LIKE '%usp_Receivables_Invoice_Closed_AUTO%' 
+AND OBJECTPROPERTY(id, 'IsProcedure') = 1 
+GROUP BY OBJECT_NAME(id)
+
+sp_help 'receivables_systemdatamain'
+
+exec sys.sp_tables
+
+select * from sys.tables
+order by modify_date desc
+
+exec sp_depends receivables_systemdatamain
+
+SELECT t.name AS table_name,
+SCHEMA_NAME(schema_id) AS schema_name,
+c.name AS column_name
+FROM sys.tables AS t
+INNER JOIN sys.columns c ON t.OBJECT_ID = c.OBJECT_ID 
+ORDER BY schema_name, table_name;
+
+--FillFactor
+select * from sys.indexes	
+select * from sys.partitions
+
+--Find Heap,Clustered Indexes
+select o.name,i.* 
+from sys.objects o
+join sys.indexes i on o.object_id = i.object_id
+
+
+SELECT name, create_date, modify_date 
+FROM sys.objects
+WHERE type = 'P' 
+order by modify_date desc
+
+--number of user accessing  DB
+SELECT * FROM sys.dm_tran_locks
+WHERE resource_type = 'DATABASE'
+AND resource_database_id = DB_ID('BillingManager')
