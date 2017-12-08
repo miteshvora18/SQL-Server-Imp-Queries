@@ -1,0 +1,55 @@
+public static void DownloadToCSV(DataSet ds, string _fileURL, System.Web.UI.Page _Page)
+        {
+
+            _fileURL = _fileURL.Replace("/", "&");
+            StreamWriter sw = new StreamWriter(_fileURL);
+            int iTableCnt = ds.Tables.Count;
+
+            if (iTableCnt != 0)
+            {
+
+                //Fill headers.                      
+                int iColCount = ds.Tables[0].Columns.Count;
+                for (int i = 0; i < iColCount; i++)
+                {
+                    sw.Write(ds.Tables[0].Columns[i]);
+                    if (i < iColCount - 1)
+                    {
+                        sw.Write(",");
+                    }
+                }
+                sw.Write(sw.NewLine);
+
+
+                //Fill data
+                for (int j = 0; j < iTableCnt; j++)
+                {
+                    foreach (DataRow dr in ds.Tables[j].Rows)
+                    {
+                        for (int i = 0; i < iColCount; i++)
+                        {
+                            if (!Convert.IsDBNull(dr[i]))
+                            {
+                                sw.Write("\"" + dr[i].ToString().Replace("\"", "\"\"") + "\"");
+                            }
+                            else
+                            {
+                                sw.Write("\"" + "\"");
+                            }
+                            if (i < iColCount - 1)
+                            {
+                                sw.Write(",");
+                            }
+                        }
+                        sw.Write(sw.NewLine);
+                    }
+                }
+                sw.Close();
+
+            }
+
+            //Code to download the written file.
+            _Page.Response.Clear();
+            Common.ResponseFile(_Page.Request, _Page.Response, Path.GetFileName(_fileURL).ToString(), _fileURL, 1024);
+            _Page.Response.End();
+        }
